@@ -53,4 +53,6 @@ public class Goal {
     public void setSolved(boolean solved) {
         mSolved = solved;
     }
+
+
 }

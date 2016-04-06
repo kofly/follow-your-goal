@@ -18,12 +18,6 @@ public class GoalLab {
     private GoalLab(Context appContext){
         mAppContext = appContext;
         mGoals = new ArrayList<Goal>();
-        for (int i = 0; i < 100; i++) {
-            Goal g = new Goal();
-            g.setTitle("Crime #" + i);
-            g.setSolved(i % 2 == 0); // every other one
-            mGoals.add(g);
-        }
     }
 
     public static GoalLab get(Context c){
@@ -43,5 +37,13 @@ public class GoalLab {
 
     public ArrayList<Goal> getGoals(){
         return mGoals;
+    }
+
+    public void addGoal(Goal g){
+        mGoals.add(g);
+    }
+
+    public void deleteGoal(Goal g){
+        mGoals.remove(g);
     }
 }

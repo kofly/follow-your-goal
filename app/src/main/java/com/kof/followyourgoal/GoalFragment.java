@@ -8,6 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -45,6 +48,7 @@ public class GoalFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         UUID goalId = (UUID)getArguments().getSerializable(EXTRA_GOAL_ID);
         mGoal = GoalLab.get(getActivity()).getGoal(goalId);
@@ -110,4 +114,22 @@ public class GoalFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_goal, menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_goal:
+                Intent intent = new Intent(getActivity(), GoalListActivity.class);
+                startActivity(intent);
+                GoalLab.get(getActivity()).deleteGoal(mGoal);
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
