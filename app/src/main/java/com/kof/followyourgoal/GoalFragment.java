@@ -55,6 +55,13 @@ public class GoalFragment extends Fragment {
 
     }
 
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        GoalLab.get(getActivity()).updateGoal(mGoal);
+    }
+
     public void updateDate(){
         mDateButton.setText(mGoal.getDate().toString());
     }

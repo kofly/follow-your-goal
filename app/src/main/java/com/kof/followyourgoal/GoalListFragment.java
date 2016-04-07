@@ -114,6 +114,7 @@ public class GoalListFragment extends Fragment {
             mAdapter = new GoalAdapter(goals);
             mGoalRecyclerView.setAdapter(mAdapter);
         } else {
+            mAdapter.setGoals(goals);
             mAdapter.notifyDataSetChanged();
         }
 
@@ -176,6 +177,10 @@ public class GoalListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mGoals.size();
+        }
+
+        public void setGoals(List<Goal> goals){
+            mGoals = goals;
         }
     }
 }

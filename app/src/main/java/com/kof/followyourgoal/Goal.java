@@ -17,7 +17,11 @@ public class Goal {
 
 
     public Goal(){
-        mId = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+
+    public Goal(UUID id){
+        mId = id;
         mDate = new Date();
     }
 
