@@ -2,7 +2,9 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kof/followyourgoal/GoalActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/kof/followyourgoal/PictureUtils.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/list_item_goal.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/view_camera_and_title.xml" charset="GBK" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

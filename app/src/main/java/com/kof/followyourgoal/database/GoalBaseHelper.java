@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.kof.followyourgoal.Goal;
 import com.kof.followyourgoal.database.GoalDbSchema.GoalTable;
 
 /**
@@ -24,7 +25,9 @@ public class GoalBaseHelper extends SQLiteOpenHelper {
                 GoalTable.Cols.UUID + ", " +
                 GoalTable.Cols.TITLE + ", " +
                 GoalTable.Cols.DATE + ", " +
-                GoalTable.Cols.SOLVED + ")");
+                GoalTable.Cols.SOLVED + "," +
+                GoalTable.Cols.PARTNER +
+                ")");
     }
 
     @Override

@@ -1,8 +1,5 @@
 package com.kof.followyourgoal;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Date;
 import java.util.UUID;
 
@@ -14,6 +11,10 @@ public class Goal {
     private String mTitle;
     private Date mDate;
     private boolean mSolved;
+
+
+
+    private String mPartner;
 
 
     public Goal(){
@@ -56,6 +57,18 @@ public class Goal {
 
     public void setSolved(boolean solved) {
         mSolved = solved;
+    }
+
+    public String getPartner() {
+        return mPartner;
+    }
+
+    public void setPartner(String partner) {
+        mPartner = partner;
+    }
+
+    public String getPhotoFilename(){
+        return "IMG_" + getId().toString() + ".jpg";
     }
 
 

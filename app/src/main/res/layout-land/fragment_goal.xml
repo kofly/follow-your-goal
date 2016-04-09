@@ -4,6 +4,9 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+    <include
+        layout="@layout/view_camera_and_title"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,6 +46,30 @@
             android:layout_height="wrap_content"
             android:text="@string/goal_solved_label"
             android:layout_weight="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/goal_partner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/goal_partner_text"
+            />
+
+        <Button
+            android:id="@+id/goal_report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/goal_task_text"
+            />
     </LinearLayout>
 
 </LinearLayout>

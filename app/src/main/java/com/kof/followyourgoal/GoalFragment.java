@@ -2,9 +2,16 @@ package com.kof.followyourgoal;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.ShareCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,6 +25,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import android.text.format.DateFormat;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+
+import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 
@@ -29,11 +41,18 @@ public class GoalFragment extends Fragment {
     public static final String EXTRA_GOAL_ID = "com.kof.android.followyourgoal.goal_id";
     private static final String DIALOG_DATE  = "date";
     private static final int REQUEST_DATE = 0;
+    private static final int REQUEST_CONTACT = 1;
+    private static final int REQUEST_PHOTO = 1;
 
     private Goal mGoal;
+    private File mPhotoFile;
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
+    private Button mReportButton;
+    private Button mPartnerButton;
+    private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
 
     public static GoalFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -52,6 +71,7 @@ public class GoalFragment extends Fragment {
 
         UUID goalId = (UUID)getArguments().getSerializable(EXTRA_GOAL_ID);
         mGoal = GoalLab.get(getActivity()).getGoal(goalId);
+        mPhotoFile = GoalLab.get(getActivity()).getPhotoFile(mGoal);
 
     }
 
@@ -64,6 +84,36 @@ public class GoalFragment extends Fragment {
 
     public void updateDate(){
         mDateButton.setText(mGoal.getDate().toString());
+    }
+
+    private String getGoalReport(){
+        String solvedString = null;
+        if (mGoal.isSolved()){
+            solvedString = getString(R.string.goal_report_unsolved);
+        }
+
+        String dateFormat = "EEE, MMM dd";
+        String dateString = DateFormat.format(dateFormat, mGoal.getDate()).toString();
+
+        String partner = mGoal.getPartner();
+        if (partner == null){
+            partner = getString(R.string.goal_report_partner);
+        }else {
+            partner = getString(R.string.goal_report_partner, partner);
+        }
+
+        String report = getString(R.string.goal_report,
+                mGoal.getTitle(), dateString, solvedString, partner);
+        return report;
+    }
+    //16.9 Updating mPhotoView
+    private void updatePhotoView(){
+        if (mPhotoFile == null || !mPhotoFile.exists()){
+            mPhotoView.setImageDrawable(null);
+        }else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(mPhotoFile.getPath(), getActivity());
+            mPhotoView.setImageBitmap(bitmap);
+        }
     }
 
     @Override
@@ -108,6 +158,63 @@ public class GoalFragment extends Fragment {
                 mGoal.setSolved(isChecked);
             }
         });
+
+        mReportButton = (Button)v.findViewById(R.id.goal_report);
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_TEXT, getGoalReport());
+
+                getString(R.string.goal_report_subject);
+                i = Intent.createChooser(i, getString(R.string.send_report));
+                startActivity(i);
+                // TODO: 2016/4/8   ShareCompat.IntentBuilder
+            }
+
+        });
+
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        //pickContact.addCategory(Intent.CATEGORY_HOME); //dummy code
+        mPartnerButton = (Button)v.findViewById(R.id.goal_partner);
+        mPartnerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(pickContact, REQUEST_CONTACT);
+            }
+        });
+
+        if (mGoal.getPartner() != null){
+            mPartnerButton.setText(mGoal.getPartner());
+        }
+
+        PackageManager packageManager = getActivity().getPackageManager();
+        if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null){
+            mPartnerButton.setEnabled(false);
+        }
+
+        mPhotoButton = (ImageButton)v.findViewById(R.id.goal_camera);
+
+
+
+        final Intent captrueImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        boolean canTakePhoto = mPhotoFile != null &&
+                captrueImage.resolveActivity(packageManager) != null;
+        if (canTakePhoto){
+            Uri uri = Uri.fromFile(mPhotoFile);
+            captrueImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        }
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(captrueImage, REQUEST_PHOTO);
+            }
+        });
+
+        mPhotoView = (ImageView)v.findViewById(R.id.goal_photo);
+        updatePhotoView();
+
         return v;
     }
     @Override
@@ -118,6 +225,35 @@ public class GoalFragment extends Fragment {
                     .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mGoal.setDate(date);
             updateDate();
+        }else if (requestCode == REQUEST_CONTACT && data != null) {
+            Uri contactUri = data.getData();
+            //指定你想要查询到的范围
+            //values for.
+            String[] queryFields = new String[]{
+                    ContactsContract.Contacts.DISPLAY_NAME
+            };
+            //执行查询操作 - contactUri就像是"where"
+            //clause here
+            Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null);
+
+            try {
+                //Double-check that you actually got results
+                if (c.getCount() == 0) {
+
+                    return;
+                }
+                //pull out 第一行第一列的数据
+                //那就是你搭档的名字
+                c.moveToFirst();
+                String partner = c.getString(0);
+                mGoal.setPartner(partner);
+                mPartnerButton.setText(partner);
+
+            } finally {
+                c.close();
+            }
+        }else if (requestCode == REQUEST_PHOTO){
+            updatePhotoView();
         }
     }
 

@@ -22,11 +22,13 @@ public class GoalCursorWrapper extends CursorWrapper{
         String title = getString(getColumnIndex(GoalTable.Cols.TITLE));
         long date = getLong(getColumnIndex(GoalTable.Cols.DATE));
         int isSolved = getInt(getColumnIndex(GoalTable.Cols.SOLVED));
+        String partner = getString(getColumnIndex(GoalTable.Cols.PARTNER));
 
         Goal goal = new Goal(UUID.fromString(uuidString));
         goal.setTitle(title);
         goal.setDate(new Date(date));
         goal.setSolved(isSolved != 0);
+        goal.setPartner(partner);
 
         return goal;
     }

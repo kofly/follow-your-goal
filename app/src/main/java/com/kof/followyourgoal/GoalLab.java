@@ -4,12 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 
 import com.kof.followyourgoal.database.GoalBaseHelper;
 import com.kof.followyourgoal.database.GoalCursorWrapper;
 
 import com.kof.followyourgoal.database.GoalDbSchema.GoalTable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -63,6 +65,7 @@ public class GoalLab {
         values.put(GoalTable.Cols.TITLE, goal.getTitle());
         values.put(GoalTable.Cols.DATE, goal.getDate().getTime());
         values.put(GoalTable.Cols.SOLVED, goal.isSolved() ? 1 : 0);
+        values.put(GoalTable.Cols.PARTNER, goal.getPartner());
 
         return values;
 
@@ -94,6 +97,16 @@ public class GoalLab {
         cursor.close();
 
         return goals;
+    }
+    //验证有external storage来保存图片
+    public File getPhotoFile(Goal goal){
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        if (externalFilesDir == null){
+            return null;
+        }
+
+        return new File(externalFilesDir, goal.getPhotoFilename());
     }
 
     public void addGoal(Goal g){
