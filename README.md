@@ -23,3 +23,13 @@
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+14_SQLite
+代码清单 从database中delete(GoalLab.java)
+
+
+    public void deleteGoal(Goal g){
+
+        mDatabase.delete(GoalTable.NAME, GoalTable.Cols.TITLE +"=?", new String[]{g.getTitle()});
+    }
